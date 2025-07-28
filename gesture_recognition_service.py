@@ -5,9 +5,11 @@ import pickle
 import base64 
 import time
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 
 # Create Flask app
 app = Flask(__name__)
+CORS(app, origins="*", methods=["GET", "POST"], allow_headers=["Content-Type"])
 
 # Load model - matching main.py implementation
 try:

@@ -34,7 +34,8 @@ mp_draw = mp.solutions.drawing_utils
 last_process_time = time.time()
 current_fps = 0
 
-def process_image(image):
+def process_image(input_image):
+    image = cv2.resize(input_image, (160, 120))
     frame = cv2.flip(image, 1)
 
     rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -44,8 +45,6 @@ def process_image(image):
     # Process landmarks
     if results.multi_hand_landmarks:
         for hand_landmarks in results.multi_hand_landmarks:
-            # วาด landmarks
-            mp_draw.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
             
             # ดึงข้อมูล landmark
             landmarks = []
@@ -101,8 +100,6 @@ def predict():
         y_pred = mlp.predict(data.reshape(1, -1))
         predicted_gesture = str(y_pred[0])
         
-        print(f"Predicted: {y_pred}, FPS: {current_fps:.2f}")
-        
         # Return prediction as JSON with FPS
         return jsonify({
             'gesture': predicted_gesture,
@@ -123,5 +120,5 @@ def status():
     })
 
 if __name__ == '__main__':
-    print("Starting gesture recognition server on http://localhost:5555")
-    app.run(host='0.0.0.0', port=5555, debug=False)
+    print("Starting gesture recognition server on http://localhost:5000")
+    app.run(host='0.0.0.0', port=5000, debug=False)

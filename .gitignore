@@ -45,7 +45,7 @@ env/
 .ipynb_checkpoints/
 
 # Data files
-*.pkl
+
 *.h5
 *.model
 *.weights

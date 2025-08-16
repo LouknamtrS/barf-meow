@@ -3,3 +3,91 @@ DATASET2
 DATASET2_augmented
 DATASET3
 DATASET3_augmented
+
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sitemap.xml
+sitemap.xml.gz
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual environment
+venv/
+.env/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Data files
+*.pkl
+*.h5
+*.model
+*.weights
+/data/
+/train_data/
+/test_data/
+
+# Logs and databases
+*.log
+*.sqlite
+*.db
+
+# Unity build files
+*.unitypackage
+*.asset
+/Temp/
+/Library/
+/Build/
+/Builds/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# FastAPI specific
+*.state
+*.cache
+
+# Media files
+*.jpg
+*.png
+*.mp4
+*.avi
+*.mov
+
+# Config files
+config.yml
+secrets.ini
+.env
+*.env

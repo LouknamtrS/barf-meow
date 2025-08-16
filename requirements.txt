@@ -6,3 +6,7 @@ numpy
 seaborn
 flask
 flask_cors
+fastapi
+uvicorn
+python-multipart
+pillow

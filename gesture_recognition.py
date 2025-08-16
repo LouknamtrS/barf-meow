@@ -1,124 +1,90 @@
+from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 import cv2
 import mediapipe as mp
 import numpy as np
-import pickle
-import base64 
 import time
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+import pickle
+from PIL import Image
+import io
 
-# Create Flask app
-app = Flask(__name__)
-CORS(app, origins="*", methods=["GET", "POST"], allow_headers=["Content-Type"])
+app = FastAPI()
 
-# Load model - matching main.py implementation
-try:
-    with open('mlp_model.pkl', 'rb') as f:
-        mlp = pickle.load(f)
-    print("Model loaded successfully")
-except Exception as e:
-    print(f"Error loading model: {e}")
-    mlp = None
+# Configure CORS to allow requests from Unity
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Adjust this to be more restrictive for production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# Initialize MediaPipe Hands - matching main.py configuration
+# Load the model
+with open('svm_model_v3.pkl', 'rb') as f:
+    svm = pickle.load(f)
+
+# Initialize Mediapipe Hands
 mp_hands = mp.solutions.hands
 hands = mp_hands.Hands(
-    static_image_mode=False,  # Set to false as in main.py
+    static_image_mode=True,  # Changed to True since we're processing single images
     max_num_hands=1,
     min_detection_confidence=0.7,
     min_tracking_confidence=0.7
 )
-mp_draw = mp.solutions.drawing_utils
 
-# Store last processing time for FPS calculation
-last_process_time = time.time()
-current_fps = 0
+# State tracking variables
+current_state = "none"
+last_stable_state = "none"
+stable_count = 0
+STABILITY_THRESHOLD = 5
 
-def process_image(input_image):
-    image = cv2.resize(input_image, (160, 120))
-    frame = cv2.flip(image, 1)
-
-    rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    
-    results = hands.process(rgb_frame)
-    
-    # Process landmarks
-    if results.multi_hand_landmarks:
-        for hand_landmarks in results.multi_hand_landmarks:
-            
-            # ดึงข้อมูล landmark
-            landmarks = []
-            for lm in hand_landmarks.landmark:
-                landmarks.extend([lm.x, lm.y, lm.z])
-            
-            if len(landmarks) == 63:
-                return landmarks
-            else:
-                print("Incomplete landmarks detected")
-    
-    return None
-
-@app.route('/predict', methods=['POST'])
-def predict():
-    global last_process_time, current_fps
+@app.post("/predict")
+async def predict_gesture(file: UploadFile = File(...)):
+    global current_state, last_stable_state, stable_count
     
     try:
-        # Calculate FPS
-        current_time = time.time()
-        elapsed_time = current_time - last_process_time
-        current_fps = 1.0 / elapsed_time if elapsed_time > 0 else 0
-        last_process_time = current_time
+        # Read the image file
+        contents = await file.read()
+        image = Image.open(io.BytesIO(contents)).convert('RGB')
         
-        # Get image data from request
-        data = request.json
-        if not data or 'image' not in data:
-            return jsonify({'error': 'No image data provided'}), 400
+        # Convert to numpy array and OpenCV format
+        frame = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+        frame = cv2.flip(frame, 1)  # Mirror the image like in your original code
         
-        # Decode base64 image
-        image_data = base64.b64decode(data['image'])
-        nparr = np.frombuffer(image_data, np.uint8)
-        image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        # Process with Mediapipe
+        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        results = hands.process(rgb_frame)
         
-        if image is None:
-            return jsonify({'error': 'Invalid image data'}), 400
-        
-        # Process image to get landmarks using main.py approach
-        landmarks = process_image(image)
-        
-        if landmarks is None:
-            return jsonify({
-                'gesture': 'none',
-                'confidence': 0.0,
-                'error': 'No hand detected'
-            })
-        
-        if mlp is None:
-            return jsonify({'error': 'Model not loaded'}), 500
+        if results.multi_hand_landmarks:
+            for hand_landmarks in results.multi_hand_landmarks:
+                landmarks = []
+                for lm in hand_landmarks.landmark:
+                    landmarks.extend([lm.x, lm.y, lm.z])
+
+                if len(landmarks) == 63:
+                    data = np.array(landmarks)
+                    y_pred = svm.predict(data.reshape(1, -1))
+                    predicted_gesture = str(y_pred[0])
+
+                    # State Machine
+                    if predicted_gesture == current_state:
+                        stable_count += 1
+                    else:
+                        current_state = predicted_gesture
+                        stable_count = 1
+
+                    if stable_count >= STABILITY_THRESHOLD:
+                        last_stable_state = current_state
+
+                    return {"gesture": last_stable_state}
+                else:
+                    return {"gesture": "none", "message": "Incomplete hand landmarks"}
+        else:
+            return {"gesture": "none", "message": "No hand detected"}
             
-        # Make prediction using the same approach as main.py
-        data = np.array(landmarks)
-        y_pred = mlp.predict(data.reshape(1, -1))
-        predicted_gesture = str(y_pred[0])
-        
-        # Return prediction as JSON with FPS
-        return jsonify({
-            'gesture': predicted_gesture,
-            'confidence': 1.0,
-            'fps': round(current_fps, 2)
-        })
-        
     except Exception as e:
-        print(f"Error processing request: {e}")
-        return jsonify({'error': str(e)}), 500
+        raise HTTPException(status_code=500, detail=str(e))
 
-# Add a simple status endpoint
-@app.route('/', methods=['GET'])
-def status():
-    return jsonify({
-        'status': 'Hand gesture recognition service is running',
-        'fps': round(current_fps, 2)
-    })
-
-if __name__ == '__main__':
-    print("Starting gesture recognition server on http://localhost:5000")
-    app.run(host='0.0.0.0', port=5000, debug=False)
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

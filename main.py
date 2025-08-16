@@ -25,7 +25,7 @@ prev_time = time.time()
 current_state = "none"
 last_stable_state = "none"
 stable_count = 0
-STABILITY_THRESHOLD = 5  # ต้องเจอ gesture ซ้ำ 3 frame ถึงจะเปลี่ยน
+STABILITY_THRESHOLD = 5  #ต้องเจอ gesture ซ้ำ 5 frame ถึงจะเปลี่ยน
 
 while cap.isOpened():
     ret, frame = cap.read()
@@ -49,18 +49,21 @@ while cap.isOpened():
                 predicted_gesture = str(y_pred[0])
 
                 # --- State Machine ---
-                if predicted_gesture == current_state:
-                    stable_count += 1
+                if predicted_gesture == "transition":
+                    # ไม่อัปเดต last_stable_state
+                    stable_count = 0
                 else:
-                    current_state = predicted_gesture
-                    stable_count = 1
+                    if predicted_gesture == current_state:
+                        stable_count += 1
+                    else:
+                        current_state = predicted_gesture
+                        stable_count = 1
 
-                if stable_count >= STABILITY_THRESHOLD:
-                    last_stable_state = current_state
+                    if stable_count >= STABILITY_THRESHOLD:
+                        last_stable_state = current_state
 
-                #แสดงผล gesture หลัง filter
+                #  last_stable_state แสดงผล
                 display_gesture = last_stable_state
-                print("Predicted:", predicted_gesture, "Filtered:", display_gesture)
                 cv2.putText(frame, display_gesture, (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 0, 0), 5)
 
             else:

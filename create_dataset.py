@@ -3,8 +3,8 @@ import cv2 as cv
 from pathlib import Path
 
 def get_image():
-    Class = 'yes'
-    save_path = Path(f'DATASET/{Class}')
+    Class = 'grab'
+    save_path = Path(f'DATASET3/{Class}')
     save_path.mkdir(parents=True, exist_ok=True)
 
     existing_files = list(save_path.glob('*.png'))

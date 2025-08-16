@@ -23,20 +23,23 @@ def image_processed(file_path):
         return np.zeros(63).tolist()
 
 def make_csv():
-    mypath = 'DATASET'
-    with open('dataset.csv', 'w') as file:
+    mypath = 'DATASET3'
+    with open('dataset3.csv', 'w') as file:
         headers = [f'x{i}' for i in range(21)] + [f'y{i}' for i in range(21)] + [f'z{i}' for i in range(21)] + ['label']
         file.write(','.join(headers) + '\n')
 
         for each_folder in os.listdir(mypath):
-            if each_folder.startswith('._'):
+            folder_path = os.path.join(mypath, each_folder)
+            #ข้ามถ้าไม่ใช่โฟลเดอร์
+            if not os.path.isdir(folder_path):
                 continue
 
-            for each_file in os.listdir(os.path.join(mypath, each_folder)):
-                if each_file.startswith('._'):
+            for each_file in os.listdir(folder_path):
+                file_path = os.path.join(folder_path, each_file)
+                #ข้ามถ้าไม่ใช่ไฟล์ภาพ
+                if not os.path.isfile(file_path):
                     continue
 
-                file_path = os.path.join(mypath, each_folder, each_file)
                 label = each_folder
                 data = image_processed(file_path)
 

@@ -5,7 +5,7 @@ import time
 import pickle
 
 #โหลดโมเดล
-with open('svm_model_v3.pkl', 'rb') as f:
+with open('svm_model_v6.pkl', 'rb') as f:
     svm = pickle.load(f)
 
 #Mediapipe Hands

@@ -6,6 +6,10 @@ import numpy as np
 
 def image_processed(file_path):
     hand_img = cv2.imread(file_path)
+    if hand_img is None:
+        print(f"[WARN] Cannot read file: {file_path}")
+        return np.zeros(63).tolist()
+
     img_rgb = cv2.cvtColor(hand_img, cv2.COLOR_BGR2RGB)
 
     mp_hands = mp.solutions.hands
@@ -22,9 +26,10 @@ def image_processed(file_path):
     except:
         return np.zeros(63).tolist()
 
+
 def make_csv():
-    mypath = 'DATASET3'
-    with open('dataset3.csv', 'w') as file:
+    mypath = 'DATASET3_augmented'
+    with open('dataset4_augmented.csv', 'w') as file:
         headers = [f'x{i}' for i in range(21)] + [f'y{i}' for i in range(21)] + [f'z{i}' for i in range(21)] + ['label']
         file.write(','.join(headers) + '\n')
 

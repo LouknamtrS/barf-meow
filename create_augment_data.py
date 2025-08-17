@@ -42,5 +42,5 @@ def data_augmentation(dataset_path):
     print("Data Augmentation Completed!")
 
 if __name__ == "__main__":
-    dataset_path = "DATASET_augmented"
+    dataset_path = "DATASET3_augmented"
     data_augmentation(dataset_path)

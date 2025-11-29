@@ -91,3 +91,7 @@ config.yml
 secrets.ini
 .env
 *.env
+
+
+confusion_matrix_v7
+confusion_matrix_v7_aug

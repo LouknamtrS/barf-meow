@@ -12,7 +12,7 @@ import json
 app = FastAPI()
 
 # Load model
-with open('svm_model_v5.pkl', 'rb') as f:
+with open('svm_model_v6.pkl', 'rb') as f:
     svm = pickle.load(f)
 
 # Mediapipe setup

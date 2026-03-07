@@ -10,6 +10,7 @@ import os
 import sys
 import uvicorn
 import asyncio
+import socket
 
 app = FastAPI()
 
@@ -149,13 +150,32 @@ async def websocket_endpoint(websocket: WebSocket):
     except WebSocketDisconnect:
         print("Unity disconnected")
 
+        try:
+            cap.release()
+        except:
+            pass
+
+        cv2.destroyAllWindows()
+
+        os._exit(0)
+
 
 
 # =========================
 # Run server
 # =========================
 
+def port_in_use(port):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        return s.connect_ex(("127.0.0.1", port)) == 0
+
+
+
 if __name__ == "__main__":
+    if port_in_use(8000):
+        print("Server already running")
+        sys.exit()
+
     print("Starting Gesture AI Server...")
 
     uvicorn.run(

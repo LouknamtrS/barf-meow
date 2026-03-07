@@ -3,7 +3,7 @@ from PyInstaller.utils.hooks import collect_all
 
 datas = [('svm_model_v6.pkl', '.')]
 binaries = []
-hiddenimports = ['fastapi', 'uvicorn', 'sklearn.svm', 'sklearn.preprocessing']
+hiddenimports = ['fastapi', 'uvicorn', 'uvicorn.logging', 'sklearn', 'sklearn.svm', 'sklearn.preprocessing', 'sklearn.utils']
 tmp_ret = collect_all('mediapipe')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 
@@ -36,7 +36,7 @@ exe = EXE(
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=False,
+    console=True,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,

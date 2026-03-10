@@ -1,1 +1,1 @@
-pyinstaller --onefile --add-data "svm_model_v6.pkl;." --collect-all mediapipe --hidden-import sklearn --hidden-import sklearn.svm --hidden-import sklearn.utils --hidden-import sklearn.preprocessing --hidden-import uvicorn --hidden-import fastapi --hidden-import asyncio h_gesture_ai.py
+pyinstaller --onefile --add-data "svm_model_v6.pkl;." --collect-all mediapipe --hidden-import fastapi --hidden-import uvicorn --hidden-import uvicorn.logging --hidden-import sklearn --hidden-import sklearn.svm --hidden-import sklearn.preprocessing --hidden-import sklearn.utils h_gesture_ai.py

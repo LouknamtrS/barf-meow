@@ -14,9 +14,7 @@ import socket
 
 app = FastAPI()
 
-# =========================
 # Load SVM model
-# =========================
 def resource_path(relative_path):
     try:
         base_path = sys._MEIPASS
@@ -30,8 +28,9 @@ with open(model_path, "rb") as f:
     svm = pickle.load(f)
 
 # =========================
+
+
 # Mediapipe setup
-# =========================
 mp_hands = mp.solutions.hands
 hands = mp_hands.Hands(
     static_image_mode=False,
@@ -41,21 +40,24 @@ hands = mp_hands.Hands(
 )
 
 # =========================
+
+
 # Webcam
-# =========================
 cap = cv2.VideoCapture(0)
 
 # =========================
+
+
 # Gesture state
-# =========================
 current_state = "none"
 last_stable_state = "none"
 stable_count = 0
 STABILITY_THRESHOLD = 3
 
 # =========================
+
+
 # FPS
-# =========================
 frame_count = 0
 last_fps_update = time.time()
 current_fps = 0
@@ -74,10 +76,10 @@ def calculate_fps():
 
     return current_fps
 
+# =========================
 
-# =========================
+
 # WebSocket
-# =========================
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
 
@@ -160,15 +162,13 @@ async def websocket_endpoint(websocket: WebSocket):
         os._exit(0)
 
 
-
 # =========================
+
+
 # Run server
-# =========================
-
 def port_in_use(port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         return s.connect_ex(("127.0.0.1", port)) == 0
-
 
 
 if __name__ == "__main__":
@@ -184,3 +184,5 @@ if __name__ == "__main__":
         port=8000,
         log_config=None
     )
+
+# =========================

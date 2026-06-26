@@ -14,6 +14,7 @@ def get_image():
     #Class = 'tips'
     #Class = 'ok'
     #Class = 'setting'
+    #Class = 'transition'
 
     save_path = Path(f'DATASET_NEW/{Class}')
     save_path.mkdir(parents=True, exist_ok=True)

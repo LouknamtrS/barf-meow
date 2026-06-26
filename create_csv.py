@@ -28,8 +28,8 @@ def image_processed(file_path):
 
 
 def make_csv():
-    mypath = 'DATASET3_augmented'
-    with open('dataset4_augmented.csv', 'w') as file:
+    mypath = 'DATASET_augmented'
+    with open('dataset_augmented.csv', 'w') as file:
         headers = [f'x{i}' for i in range(21)] + [f'y{i}' for i in range(21)] + [f'z{i}' for i in range(21)] + ['label']
         file.write(','.join(headers) + '\n')
 

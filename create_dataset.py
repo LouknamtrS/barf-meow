@@ -3,17 +3,17 @@ import cv2 as cv
 from pathlib import Path
 
 def get_image():
-    #Class = 'right'
-    #Class = 'left'
-    #Class = 'grab'
-    #Class = 'cooking'
-    #Class = 'stop'
-    #Class = 'recipe'
-    #Class = 'up'
-    #Class = 'down'
-    #Class = 'tips'
-    #Class = 'ok'
-    #Class = 'setting'
+    # Class = 'right'
+    # Class = 'left'
+    Class = 'grab'
+    # Class = 'cooking'
+    # Class = 'stop'
+    # Class = 'recipe'
+    # Class = 'up'
+    # Class = 'down'
+    # Class = 'tips'
+    # Class = 'ok'
+    # Class = 'setting'
 
     save_path = Path(f'DATASET_NEW/{Class}')
     save_path.mkdir(parents=True, exist_ok=True)
@@ -43,7 +43,7 @@ def get_image():
             cv.imwrite(str(save_path / f'{i}.png'), frame)
 
         cv.imshow('frame', frame)
-        if cv.waitKey(1) == ord('q') or i >= start_num + 500:
+        if cv.waitKey(1) == ord('q') or i >= start_num + 2500:
             break
 
         i += 1

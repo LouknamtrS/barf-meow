@@ -20,7 +20,7 @@ def augment_image(image, class_name):
     augmented_images.append(blurred)
 
     #Random Horizontal Flip
-    if class_name not in ["rh_left", "rh_right", "lh_left", "lh_right"]:
+    if class_name not in ["left", "right"]:
         flipped = cv2.flip(image, 1)
         augmented_images.append(flipped)
 
